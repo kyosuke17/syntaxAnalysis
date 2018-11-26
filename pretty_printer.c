@@ -1,11 +1,12 @@
-#include <token_list.h>
+
+
+#include "token_list.h"
 
 #define NOMAL 0
 #define ERROR 1
 
 int break_flag;
-int error(char message);
-
+int error(char *mesasge);
 int block();
 int var_dec();
 int varname_array();
@@ -22,7 +23,7 @@ int switch_st();
 int while_st();
 int break_st();
 int procedure_call();
-int formula_arrray();
+int formula_array();
 int return_st();
 int substitution_st();
 int left_side();
@@ -34,7 +35,7 @@ int factor();
 int constant();
 int multi_ope();
 int add_ope();
-int relation_ope();
+int relational_ope();
 int input_st();
 int output_st();
 int output_specification();
@@ -65,7 +66,7 @@ int parse_program() {
 }
 
 int block() {
-    while(token == TVAR || tokne == TPROCEDURE) {
+    while(token == TVAR || token == TPROCEDURE) {
         if(token == TVAR) {
             if(var_dec() == ERROR) {
                 return ERROR;
@@ -78,44 +79,6 @@ int block() {
     }
     if(compound_st() == ERROR) {
         return ERROR;
-    }
-    return NOMAL;
-}
-
-int var_dec() {
-    if(token != TVAR) {
-        return error("Keyword 'var' is not found.");
-    }
-    token = scan();
-    if(varname_array() == ERROR) {
-        return ERROR;
-    }
-    if(token != TCOLON) {
-        return error("colon is not found.");
-    }
-    token = scan();
-    if(type() == ERROR) {
-        return ERROR;
-    }
-    if(token != TSEMI) {
-        return error("':' is not found.");
-    }
-    token = scan();
-    while(token == TNAME) {
-        if(varname_array() == ERROR) {
-            return ERROR;
-        }
-        if(token != TCOLON) {
-            return error("':' is not found.");
-        }
-        token = scan();
-        if(type() == ERROR) {
-            return ERROR;
-        }
-        if(token != TSEMI) {
-            return error("';' is not found.");
-        }
-        token = scan();
     }
     return NOMAL;
 }
@@ -160,7 +123,7 @@ int type() {
 }
 
 int standard_type() {
-    if(token == TINTEGER || token == TBOOLEAN || token TCHAR ) {
+    if(token == TINTEGER || token == TBOOLEAN || token == TCHAR ) {
         token = scan();
         return NOMAL;
     } else {
@@ -169,7 +132,7 @@ int standard_type() {
 }
 
 int array_type() {
-    if(token != TVARRAY) {
+    if(token != TARRAY) {
         return error("keyboard 'array' is not found.");
     }
     token = scan();
@@ -235,6 +198,45 @@ int sub_program_dec() {
     return NOMAL;
 }
 
+int var_dec() {
+    if(token != TVAR) {
+        return error("Keyword 'var' is not found.");
+    }
+    token = scan();
+    if(varname_array() == ERROR) {
+        return ERROR;
+    }
+    if(token != TCOLON) {
+        return error("colon is not found.");
+    }
+    token = scan();
+    if(type() == ERROR) {
+        return ERROR;
+    }
+    if(token != TSEMI) {
+        return error("':' is not found.");
+    }
+    token = scan();
+    while(token == TNAME) {
+        if(varname_array() == ERROR) {
+            return ERROR;
+        }
+        if(token != TCOLON) {
+            return error("':' is not found.");
+        }
+        token = scan();
+        if(type() == ERROR) {
+            return ERROR;
+        }
+        if(token != TSEMI) {
+            return error("';' is not found.");
+        }
+        token = scan();
+    }
+    return NOMAL;
+}
+
+
 
 int procedure_name() {
     if(token != TNAME) {
@@ -277,156 +279,156 @@ int parameter() {
     }
     token = scan();
     return NOMAL;
-
+    
 }
 
 int compound_st() {
     if(token != TBEGIN) {
-		return error("Keyword 'begin' is not found.");
-	}
-	token = scan();
-	if(statement() == ERROR){
-		return ERROR;
-	}
-	while(token == TSEMI) {
-		token = scan();
-		if(statement() == ERROR){
-			return ERROR;
-		}
-	}
-	if(token != TEND) {
-		return error("Keyword 'end' is not found.");
-	}
-	token = scan();
-	return NORMAL;
+        return error("Keyword 'begin' is not found.");
+    }
+    token = scan();
+    if(statement() == ERROR){
+        return ERROR;
+    }
+    while(token == TSEMI) {
+        token = scan();
+        if(statement() == ERROR){
+            return ERROR;
+        }
+    }
+    if(token != TEND) {
+        return error("Keyword 'end' is not found.");
+    }
+    token = scan();
+    return NORMAL;
 }
 
 int statement() {
-	switch(token){
-	case TNAME:
-		if(substitution_st() == ERROR) {
-			return ERROR;
-		}
-		break;
-	case TIF:
-		if(switch_st() == ERROR) {
-			return ERROR;
-		}
-		break;
-	case TWHILE:
-		if(while_st() == ERROR) {
-			return ERROR;
-		}
-		break;
-	case TBREAK:
-		if(break_st() == ERROR) {
-			return ERROR;
-		}
-		break;
-	case TCALL:
-		if(procedure_call() == ERROR) {
-			return ERROR;
-		}
-		break;
-	case TRETURN:
-		if(return_st() == ERROR) {
-			return ERROR;
-		}
-		break;
-	case TREAD:/* to do: */
-	case TREADLN:
-		if(input_st() == ERROR) {
-			return ERROR;
-		}
-		break;
-	case TWRITE:
-	case TWRITELN:
-		if(output_st() == ERROR) {
-			return ERROR;
-		}
-		break;
-	case TBEGIN:
-		if(compound_st() == ERROR) {
-			return ERROR;
-		}
-		break;
-	}
-	return NORMAL;
+    switch(token){
+        case TNAME:
+            if(substitution_st() == ERROR) {
+                return ERROR;
+            }
+            break;
+        case TIF:
+            if(switch_st() == ERROR) {
+                return ERROR;
+            }
+            break;
+        case TWHILE:
+            if(while_st() == ERROR) {
+                return ERROR;
+            }
+            break;
+        case TBREAK:
+            if(break_st() == ERROR) {
+                return ERROR;
+            }
+            break;
+        case TCALL:
+            if(procedure_call() == ERROR) {
+                return ERROR;
+            }
+            break;
+        case TRETURN:
+            if(return_st() == ERROR) {
+                return ERROR;
+            }
+            break;
+        case TREAD:/* to do: */
+        case TREADLN:
+            if(input_st() == ERROR) {
+                return ERROR;
+            }
+            break;
+        case TWRITE:
+        case TWRITELN:
+            if(output_st() == ERROR) {
+                return ERROR;
+            }
+            break;
+        case TBEGIN:
+            if(compound_st() == ERROR) {
+                return ERROR;
+            }
+            break;
+    }
+    return NORMAL;
 }
 
 int switch_st() {
-	if(token != TIF) {
-		return error("Keyword 'if' is not found.");
-	}
-	token = scan();
-	if(fomula() == ERROR) {
-		return ERROR;
-	}
-	if(token != TTHEN) {
-		return error("Keyword 'then' is not found.");
-	}
-	token =scan();
-	if(statement() == ERROR) {
-		return ERROR;
-	}
-	if(token == TELSE) {
-		token = scan();
-		if(statement() == ERROR) {
-			return ERROR;
-		}
-	}
-	return NORMAL;
+    if(token != TIF) {
+        return error("Keyword 'if' is not found.");
+    }
+    token = scan();
+    if(fomula() == ERROR) {
+        return ERROR;
+    }
+    if(token != TTHEN) {
+        return error("Keyword 'then' is not found.");
+    }
+    token =scan();
+    if(statement() == ERROR) {
+        return ERROR;
+    }
+    if(token == TELSE) {
+        token = scan();
+        if(statement() == ERROR) {
+            return ERROR;
+        }
+    }
+    return NORMAL;
 }
 
 int while_st() {
-	b_flg = 1;
-	if(token != TWHILE){
-		return error("Keyword 'while' is not found.");
-	}
-	token = scan();
-	if(fomula() == ERROR){
-		return ERROR;
-	}
-	if(token != TDO){
-		return error("Keyword 'do' is not found.");
-	}
-	token = scan();
-	if(statement() == ERROR){
-		return ERROR;
-	}
-	b_flg = 0;
-	return NORMAL;
+    break_flag = 1;
+    if(token != TWHILE){
+        return error("Keyword 'while' is not found.");
+    }
+    token = scan();
+    if(fomula() == ERROR){
+        return ERROR;
+    }
+    if(token != TDO){
+        return error("Keyword 'do' is not found.");
+    }
+    token = scan();
+    if(statement() == ERROR){
+        return ERROR;
+    }
+    break_flag = 0;
+    return NORMAL;
 }
 
 int break_st() {
-    if(!b_flg){
-		return error("Keyword 'break' is found  outside the while statement.");
-	}
-	if(token != TBREAK){
-		return error("Keyword 'break' is not found.");
-	}
-	return NORMAL;
+    if(!break_flag){
+        return error("Keyword 'break' is found  outside the while statement.");
+    }
+    if(token != TBREAK){
+        return error("Keyword 'break' is not found.");
+    }
+    return NORMAL;
 }
 
 int procedure_call() {
     if(token != TCALL){
-		return error("Keyword 'call' is not found.");
-	}
-	token = scan();
-	if(procedure_name() == ERROR){
-		return ERROR;
-	}
-	if(token == TLPAREN){
-		token =scan();
-		if(formula_array() == ERROR){
-			return ERROR;
-		}
-		if(token != TRPAREN){
-			return error("')' is not found.");
-		}
-		token = scan();
-	}
-	return NORMAL;
+        return error("Keyword 'call' is not found.");
+    }
+    token = scan();
+    if(procedure_name() == ERROR){
+        return ERROR;
+    }
+    if(token == TLPAREN){
+        token =scan();
+        if(formula_array() == ERROR){
+            return ERROR;
+        }
+        if(token != TRPAREN){
+            return error("')' is not found.");
+        }
+        token = scan();
+    }
+    return NORMAL;
 }
 
 int formula_array() {
@@ -489,218 +491,219 @@ int variable() {
 }
 
 int fomula() {
-	if(simple_fomula() == ERROR){
-		return ERROR;
-	}
-	while(token == TEQUAL||token == TNOTEQ||token == TLE||token == TLEEQ||token == TGR||token == TGREQ){
-		if(relational_ope() == ERROR){
-			return ERROR;
-		}
-		if(simple_fomula() == ERROR){
-			return ERROR;
-		}
-	}
-	return NORMAL;
+    if(simple_fomula() == ERROR){
+        return ERROR;
+    }
+    while(token == TEQUAL||token == TNOTEQ||token == TLE||token == TLEEQ||token == TGR||token == TGREQ){
+        if(relational_ope() == ERROR){
+            return ERROR;
+        }
+        if(simple_fomula() == ERROR){
+            return ERROR;
+        }
+    }
+    return NORMAL;
 }
 
 int simple_fomula(){
-	if(token == TPLUS||token == TMINUS){
-		token = scan();
-	}
-	if(section() == ERROR){
-		return ERROR;
-	}
-	while(token == TPLUS||token == TMINUS||token == TOR){
-		if(add_ope() == ERROR){
-			return ERROR;
-		}
-		if(section() == ERROR){
-			return ERROR;
-		}
-	}
-	return NORMAL;
+    if(token == TPLUS||token == TMINUS){
+        token = scan();
+    }
+    if(section() == ERROR){
+        return ERROR;
+    }
+    while(token == TPLUS||token == TMINUS||token == TOR){
+        if(add_ope() == ERROR){
+            return ERROR;
+        }
+        if(section() == ERROR){
+            return ERROR;
+        }
+    }
+    return NORMAL;
 }
 
 int section() {
-	if(factor()==ERROR){
-		return ERROR;
-	}
-	while(token == TSTAR||token == TAND||token == TDIV){
-		if(multi_ope() == ERROR){
-			return ERROR;
-		}
-		if(factor() == ERROR){
-			return ERROR;
-		}
-	}
-	return NORMAL;
+    if(factor()==ERROR){
+        return ERROR;
+    }
+    while(token == TSTAR||token == TAND||token == TDIV){
+        if(multi_ope() == ERROR){
+            return ERROR;
+        }
+        if(factor() == ERROR){
+            return ERROR;
+        }
+    }
+    return NORMAL;
 }
 
 int factor() {
-	switch(token){
-	case TNAME:
-		if(variable() == ERROR){
-			return ERROR;
-		}
-		break;
-	case TNUMBER:
-		if(constant() == ERROR){
-			return ERROR;
-		}
-		break;
-	case TLPAREN:
-		token = scan();
-		if(fomula() == ERROR){
-			return ERROR;
-		}
-		if(token != TRPAREN){
-			return error("')' is not found.");
-		}
-		token = scan();
-		break;
-	case TNOT:
-		token = scan();
-		if(factor() == ERROR){
-			return ERROR;
-		}
-		break;
-	case TINTEGER:
-	case TBOOLEAN:
-	case TCHAR:
-		if(standard_type() == ERROR){
-			return ERROR;
-		}
-		if(token != TLPAREN){
-			return error("'(' is not found.");
-		}
-		token = scan();
-		if(fomula() == ERROR){
-			return ERROR;
-		}
-		if(token != TRPAREN){
-			return error("')' is not found.");
-		}
-		break;
-	default:
-		token = scan();
-	}
-	return NORMAL;
+    switch(token){
+        case TNAME:
+            if(variable() == ERROR){
+                return ERROR;
+            }
+            break;
+        case TNUMBER:
+            if(constant() == ERROR){
+                return ERROR;
+            }
+            break;
+        case TLPAREN:
+            token = scan();
+            if(fomula() == ERROR){
+                return ERROR;
+            }
+            if(token != TRPAREN){
+                return error("')' is not found.");
+            }
+            token = scan();
+            break;
+        case TNOT:
+            token = scan();
+            if(factor() == ERROR){
+                return ERROR;
+            }
+            break;
+        case TINTEGER:
+        case TBOOLEAN:
+        case TCHAR:
+            if(standard_type() == ERROR){
+                return ERROR;
+            }
+            if(token != TLPAREN){
+                return error("'(' is not found.");
+            }
+            token = scan();
+            if(fomula() == ERROR){
+                return ERROR;
+            }
+            if(token != TRPAREN){
+                return error("')' is not found.");
+            }
+            break;
+        default:
+            token = scan();
+    }
+    return NORMAL;
 }
 
 int constant() {
-	if(token != TNUMBER&&token != TFALSE&&token != TTRUE&&token != TSTRING){
-		return error("Constant is not found.");
-	}
-	token = scan();
-	return NORMAL;
+    if(token != TNUMBER&&token != TFALSE&&token != TTRUE&&token != TSTRING){
+        return error("Constant is not found.");
+    }
+    token = scan();
+    return NORMAL;
 }
 
 int multi_ope() {
-	if(token != TSTAR&&token != TDIV&&token != TAND){
-		return error("Multiplicative operator is not found.");
-	}
-	token = scan();
-	return NORMAL;
+    if(token != TSTAR&&token != TDIV&&token != TAND){
+        return error("Multiplicative operator is not found.");
+    }
+    token = scan();
+    return NORMAL;
 }
 
 int add_ope() {
-	if(token != TMINUS&&token != TPLUS&&token != TOR){
-		return error("Additive operator is not found.");
-	}
-	token = scan();
-	return NORMAL;
+    if(token != TMINUS&&token != TPLUS&&token != TOR){
+        return error("Additive operator is not found.");
+    }
+    token = scan();
+    return NORMAL;
 }
 
 int relational_ope() {
-	if(token != TEQUAL&&token != TNOTEQ&&token != TLE&&token != TLEEQ&&token != TGR&&token != TGREQ){
-		return error("relational operator is not found.");
-	}
-	token = scan();
-	return NORMAL;
+    if(token != TEQUAL&&token != TNOTEQ&&token != TLE&&token != TLEEQ&&token != TGR&&token != TGREQ){
+        return error("relational operator is not found.");
+    }
+    token = scan();
+    return NORMAL;
 }
 
 int input_st() {
-	if(token != TREAD&&token != TREADLN){
-		return error("Keyword 'read' or 'readln' is not found.");
-	}
-	token = scan();
-	if(token == TLPAREN){
-		token = scan();
-		if(variable() == ERROR){
-			return ERROR;
-		}
-		while(token == TCOMMA){
-			token = scan();
-			if(variable() == ERROR){
-				return ERROR;
-			}
-		}
-		if(token != TRPAREN){
-			return error("')' is not found.");
-		}
-		token = scan();
-	}
-	return NORMAL;
+    if(token != TREAD&&token != TREADLN){
+        return error("Keyword 'read' or 'readln' is not found.");
+    }
+    token = scan();
+    if(token == TLPAREN){
+        token = scan();
+        if(variable() == ERROR){
+            return ERROR;
+        }
+        while(token == TCOMMA){
+            token = scan();
+            if(variable() == ERROR){
+                return ERROR;
+            }
+        }
+        if(token != TRPAREN){
+            return error("')' is not found.");
+        }
+        token = scan();
+    }
+    return NORMAL;
 }
 
 int output_st() {
-	if(token != TWRITE&&token != TWRITELN){
-		return error("Keyword 'write' or 'writeln' is not found.");
-	}
-	token = scan();
-	if(token == TLPAREN){
-		token = scan();
-		if(output_specification() == ERROR){
-			return ERROR;
-		}
-
-		while(token == TCOMMA){
-			token = scan();
-			if(output_specification() == ERROR){
-				return ERROR;
-			}
-		}
-		if(token != TRPAREN){
-			return error("')' is not found.");
-		}
-		token = scan();
-	}
-	return NORMAL;
+    if(token != TWRITE&&token != TWRITELN){
+        return error("Keyword 'write' or 'writeln' is not found.");
+    }
+    token = scan();
+    if(token == TLPAREN){
+        token = scan();
+        if(output_specification() == ERROR){
+            return ERROR;
+        }
+        
+        while(token == TCOMMA){
+            token = scan();
+            if(output_specification() == ERROR){
+                return ERROR;
+            }
+        }
+        if(token != TRPAREN){
+            return error("')' is not found.");
+        }
+        token = scan();
+    }
+    return NORMAL;
 }
 
 int output_specification() {
-	if((token == '+')||(token == '-')||(token == TNAME)||(token == TNUMBER)||(token == TLPAREN)||(token == TNOT)||(token == TINTEGER)||(token == TBOOLEAN)||(token == TCHAR)){
-		if(fomula() == ERROR){
-			return ERROR;
-		}
-		if(token == TCOLON){
-			token = scan();
-			if(token != TNUMBER){
-				return error("Unsigned integer is not found.");
-			}
-			token = scan();
-		}
-	}
-	else if(token == TSTRING){
-		token = scan();
-	}
-	return NORMAL;
+    if((token == '+')||(token == '-')||(token == TNAME)||(token == TNUMBER)||(token == TLPAREN)||(token == TNOT)||(token == TINTEGER)||(token == TBOOLEAN)||(token == TCHAR)){
+        if(fomula() == ERROR){
+            return ERROR;
+        }
+        if(token == TCOLON){
+            token = scan();
+            if(token != TNUMBER){
+                return error("Unsigned integer is not found.");
+            }
+            token = scan();
+        }
+    }
+    else if(token == TSTRING){
+        token = scan();
+    }
+    return NORMAL;
 }
 
 int error(char *message) {
-    printf('\nERROR : %s  \n at line %d\n',message,get_linenum());
+    printf("\nERROR : %s  at line %d\n", message, get_linenum());
     end_scan();
     return ERROR;
 }
 
 void pretty_printer() {
+    printf("pretty_printer");
     int start_st;
-
-
+    
+    
     int sub_dec = 0;
     int n_line = 0;
     int count = 0;
-
+    
     while((token = scan()) >= 0) {
         if(token != TBEGIN && sub_dec && n_line) {
             printf("    ");
@@ -713,6 +716,7 @@ void pretty_printer() {
                 break;
             case TPROCEDURE:
                 sub_dec = 1;
+                break;
             case TVAR:
                 if(get_linenum() == start_st + 1) {
                     printf("    ");
@@ -720,10 +724,10 @@ void pretty_printer() {
                 printf("%s ", tokenstr[token]);
                 break;
             case TBEGIN:
-                ++cnt;
+                ++count;
                 n_line = 1;
                 printf("%s \n", tokenstr[token]);
-                for(int i = 0; i < cnt; i++) {
+                for(int i = 0; i < count; i++) {
                     printf("    ");
                 }
                 break;
