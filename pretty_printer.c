@@ -82,7 +82,7 @@ int block() {
     return NOMAL;
 }
 
-int ver_dec() {
+int var_dec() {
     if(token != TVAR) {
         return error("Keyword 'var' is not found.");
     }
